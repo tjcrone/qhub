@@ -11,6 +11,16 @@ import requests
 from qhub.provider.oauth.auth0 import create_client
 from qhub.provider.cicd import github
 from qhub.provider import git
+from qhub.schema import (
+    Base,
+    Field,
+    ProviderEnum,
+    CiEnum,
+    AuthenticationEnum,
+    TerraformStateEnum,
+    Main,
+    App,
+)
 
 from qhub.utils import (
     namestr_regex,
@@ -21,6 +31,71 @@ from qhub.utils import (
 from .version import __version__
 
 logger = logging.getLogger(__name__)
+
+
+class MainAlias(Base, App):
+    """a public facing class that exposes high level configuration context.
+
+    this class is partial version of the complete configuration. this class
+    is expanded to create the formal configuration file used to provision qhub instances.
+    """
+
+    platform: ProviderEnum = Field(description="Cloud to deploy qhub on")
+    project: str = Field(description="Name to assign to qhub resources")
+    namespace: str = Field("dev", description="Namespace to assign to qhub resources")
+    domain: str = Field(
+        description="Domain for jupyterhub cluster to be deployed under"
+    )
+    ci_provider: CiEnum = Field(
+        CiEnum.github_actions,
+        description="auth provider to use for authentication",
+    )
+    auth_provider: AuthenticationEnum = Field(
+        AuthenticationEnum.github, description="auth provider to use for authentication"
+    )
+    repository: str = Field(description="Repository to initialize qhub")
+    repository_auto_provision: bool = Field(
+        True,
+        description="Attempt to automatically provision repository. For github it requires environment variables GITHUB_USERNAME, GITHUB_TOKEN",
+    )
+    auth_auto_provision: bool = Field(
+        True,
+        description="Attempt to automatically provision authentication. For Auth0 it requires environment variables AUTH0_DOMAIN, AUTH0_CLIENTID, AUTH0_CLIENT_SECRET",
+    )
+    terraform_state: TerraformStateEnum = Field(
+        TerraformStateEnum.remote,
+        description="Terraform state to be provisioned and stored remotely, locally on the filesystem, or using existing terraform state backend",
+    )
+    kubernetes_version: str = Field(
+        description="kubernetes version to use for cloud deployment"
+    )
+    disable_prompt: bool = Field(
+        True, description="Never prompt user for input instead leave PLACEHOLDER"
+    )
+    ssl_cert_email: str = Field(
+        None,
+        description="Allow generation of a LetsEncrypt SSL cert - requires an administrative email",
+    )
+
+    def to_main(self):
+        """translate the aliases into a formal qhub configuration"""
+        return Main(
+            **render_config(
+                project_name=self.project,
+                namespace=self.namespace,
+                qhub_domain=self.domain,
+                cloud_provider=self.platform,
+                ci_provider=self.ci_provider,
+                repository=self.repository,
+                repository_auto_provision=self.repository_auto_provision,
+                auth_provider=self.auth_provider,
+                auth_auto_provision=self.auth_auto_provision,
+                terraform_state=self.terraform_state,
+                kubernetes_version=self.kubernetes_version,
+                disable_prompt=self.disable_prompt,
+                ssl_cert_email=self.ssl_cert_email,
+            )
+        )
 
 
 BASE_CONFIGURATION = {

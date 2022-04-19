@@ -394,3 +394,52 @@ def pip_install_qhub(qhub_version: str) -> str:
         )
 
     return pip_install
+
+
+class App:
+    @classmethod
+    def schema_to_parser(cls, parser):
+        schema = cls.schema()
+        for k, v in schema["properties"].items():
+            name = "--" + k.replace(*"_-")
+            payload = cls.schema_to_argument(v, schema)
+            parser.add_argument(name, **payload)
+        return parser
+
+    @staticmethod
+    def resolve_pointer(ptr, object):
+        if isinstance(ptr, str):
+            ptr = ptr.split("/")
+        if ptr:
+            if ptr[0] == "#":
+                ptr = ptr[1:]
+            return Base.resolve_pointer(ptr[1:], object[ptr[0]])
+        return object
+
+    @staticmethod
+    def schema_to_argument(schema, parent, **data):
+        data["help"] = schema.get("description")
+        if "allOf" in schema:
+            for x in schema["allOf"]:
+                data.update(Base.schema_to_argument(x, parent))
+        if "$ref" in schema:
+            data.update(
+                Base.schema_to_argument(
+                    Base.resolve_pointer(schema["$ref"], parent), parent
+                )
+            )
+        if "enum" in schema:
+            data.update(choices=schema["enum"])
+        if "default" in schema:
+            d = schema["default"]
+            if isinstance(d, bool):
+                data.update(action="store_" + ["false", "true"][d])
+            else:
+                data.update(default=d)
+        if "type" in schema:
+            t = schema["type"]
+            if t == "boolean":
+                pass
+            else:
+                data.update(type=dict(string=str)[t])
+        return data
