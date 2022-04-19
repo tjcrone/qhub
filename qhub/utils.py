@@ -413,7 +413,7 @@ class App:
         if ptr:
             if ptr[0] == "#":
                 ptr = ptr[1:]
-            return Base.resolve_pointer(ptr[1:], object[ptr[0]])
+            return App.resolve_pointer(ptr[1:], object[ptr[0]])
         return object
 
     @staticmethod
@@ -421,11 +421,11 @@ class App:
         data["help"] = schema.get("description")
         if "allOf" in schema:
             for x in schema["allOf"]:
-                data.update(Base.schema_to_argument(x, parent))
+                data.update(App.schema_to_argument(x, parent))
         if "$ref" in schema:
             data.update(
-                Base.schema_to_argument(
-                    Base.resolve_pointer(schema["$ref"], parent), parent
+                App.schema_to_argument(
+                    App.resolve_pointer(schema["$ref"], parent), parent
                 )
             )
         if "enum" in schema:

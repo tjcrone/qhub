@@ -33,7 +33,7 @@ from .version import __version__
 logger = logging.getLogger(__name__)
 
 
-class MainAlias(Base, App):
+class Initialize(Base, App):
     """a public facing class that exposes high level configuration context.
 
     this class is partial version of the complete configuration. this class
