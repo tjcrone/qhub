@@ -455,27 +455,18 @@ letter_dash_underscore_pydantic = pydantic.constr(regex=namestr_regex)
 
 
 class MainAlias(Base, App):
-    class CiProviders(enum.Enum):
-        github_actions = "github-actions"
-        gitlab_ci = "gitlab-ci"
-        none = "none"
-
-    TerraformState = enum.Enum("TerraformState", "remote local existing")
-    AuthProvider = enum.Enum("AuthProvider", "github auth0 password")
-
     platform: ProviderEnum = Field(description="Cloud to deploy qhub on")
-
     project: str = Field(description="Name to assign to qhub resources")
     namespace: str = Field("dev", description="Namespace to assign to qhub resources")
     domain: str = Field(
         description="Domain for jupyterhub cluster to be deployed under"
     )
-    ci_provider: CiProviders = Field(
-        CiProviders.github_actions,
+    ci_provider: CiEnum = Field(
+        CiEnum.github_actions,
         description="auth provider to use for authentication",
     )
-    auth_provider: AuthProvider = Field(
-        AuthProvider.github, description="auth provider to use for authentication"
+    auth_provider: AuthenticationEnum = Field(
+        AuthenticationEnum.github, description="auth provider to use for authentication"
     )
     repository: str = Field(description="Repository to initialize qhub")
     repository_auto_provision: bool = Field(
@@ -486,8 +477,8 @@ class MainAlias(Base, App):
         True,
         description="Attempt to automatically provision authentication. For Auth0 it requires environment variables AUTH0_DOMAIN, AUTH0_CLIENTID, AUTH0_CLIENT_SECRET",
     )
-    terraform_state: TerraformState = Field(
-        TerraformState.remote,
+    terraform_state: TerraformStateEnum = Field(
+        TerraformStateEnum.remote,
         description="Terraform state to be provisioned and stored remotely, locally on the filesystem, or using existing terraform state backend",
     )
     kubernetes_version: str = Field(
