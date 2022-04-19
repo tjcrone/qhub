@@ -46,6 +46,8 @@ class Base(pydantic.BaseModel):
     class Config:
         extra = "forbid"
 
+
+class App:
     @classmethod
     def schema_to_parser(cls, parser):
         schema = cls.schema()
@@ -452,16 +454,17 @@ class ExtContainerReg(Base):
 letter_dash_underscore_pydantic = pydantic.constr(regex=namestr_regex)
 
 
-class MainAlias(Base):
+class MainAlias(Base, App):
     class CiProviders(enum.Enum):
         github_actions = "github-actions"
         gitlab_ci = "gitlab-ci"
         none = "none"
 
     TerraformState = enum.Enum("TerraformState", "remote local existing")
-
     AuthProvider = enum.Enum("AuthProvider", "github auth0 password")
+
     platform: ProviderEnum = Field(description="Cloud to deploy qhub on")
+
     project: str = Field(description="Name to assign to qhub resources")
     namespace: str = Field("dev", description="Namespace to assign to qhub resources")
     domain: str = Field(
@@ -499,21 +502,24 @@ class MainAlias(Base):
     )
 
     def to_main(self):
-        return Main(**render_config(
-            project_name=self.project,
-            namespace=self.namespace,
-            qhub_domain=self.domain,
-            cloud_provider=self.platform,
-            ci_provider=self.ci_provider,
-            repository=self.repository,
-            repository_auto_provision=self.repository_auto_provision,
-            auth_provider=self.auth_provider,
-            auth_auto_provision=self.auth_auto_provision,
-            terraform_state=self.terraform_state,
-            kubernetes_version=self.kubernetes_version,
-            disable_prompt=self.disable_prompt, 
-            ssl_cert_email=self.ssl_cert_email
-        ))
+        """translate the aliases into a formal qhub configuration"""
+        return Main(
+            **render_config(
+                project_name=self.project,
+                namespace=self.namespace,
+                qhub_domain=self.domain,
+                cloud_provider=self.platform,
+                ci_provider=self.ci_provider,
+                repository=self.repository,
+                repository_auto_provision=self.repository_auto_provision,
+                auth_provider=self.auth_provider,
+                auth_auto_provision=self.auth_auto_provision,
+                terraform_state=self.terraform_state,
+                kubernetes_version=self.kubernetes_version,
+                disable_prompt=self.disable_prompt,
+                ssl_cert_email=self.ssl_cert_email,
+            )
+        )
 
 
 class Main(Base):
