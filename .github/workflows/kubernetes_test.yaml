@@ -68,11 +68,22 @@ jobs:
 
           echo "$PWD" >> $GITHUB_PATH
           popd
-      - name: Start Minikube
+
+      - name: Create Docker user
         run: |
           sudo docker ps
           sudo usermod -aG docker $USER && newgrp docker
           minikube start --kubernetes-version=$KUBERNETES_VERSION --driver=docker --cpus 4 --memory 12288 --wait=all
+
+      - name: Start minikube
+        id: minikube
+        uses: medyagh/setup-minikube@latest
+        with:
+          minikube-version: 1.24.0
+          driver: docker
+          kubernetes-version: v1.24.0
+          cpus: 4
+          memory: 12288
       - name: Print minikube and kubectl versions
         run: |
           minikube version
