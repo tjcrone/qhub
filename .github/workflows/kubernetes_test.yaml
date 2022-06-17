@@ -13,7 +13,7 @@ on:
       - "pyproject.yoml"
   push:
     branches:
-      - main
+      - "*"
     paths:
       - ".github/workflows/kubernetes_test.yaml"
       - "tests/**"
