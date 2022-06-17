@@ -126,6 +126,11 @@ jobs:
         run: |
           cd local-deployment
           qhub deploy --config qhub-config.yaml --disable-prompt
+
+      - name: Debugging with tmate
+        if: always()
+        uses: mxschmitt/action-tmate@v3.11
+
       - name: Basic kubectl checks after deployment
         if: always()
         run: |
