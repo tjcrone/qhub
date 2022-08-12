@@ -101,6 +101,12 @@ def stage_04_kubernetes_ingress(stage_outputs, qhub_config):
         8786,  # dask-scheduler
     }
     ip_or_name = stage_outputs[directory]["load_balancer_address"]["value"]
+    import platform
+
+    if qhub_config["provider"] == "local" and platform.system() == "Darwin":
+        ip_or_name = {"hostname": qhub_config["domain"]}
+
+    print(ip_or_name)
     host = ip_or_name["hostname"] or ip_or_name["ip"]
     host = host.strip("\n")
 
@@ -120,6 +126,10 @@ def check_ingress_dns(stage_outputs, config, disable_prompt):
     directory = "stages/04-kubernetes-ingress"
 
     ip_or_name = stage_outputs[directory]["load_balancer_address"]["value"]
+    import platform
+
+    if config["provider"] == "local" and platform.system() == "Darwin":
+        ip_or_name = {"hostname": config["domain"]}
     ip = socket.gethostbyname(ip_or_name["hostname"] or ip_or_name["ip"])
     domain_name = config["domain"]
 

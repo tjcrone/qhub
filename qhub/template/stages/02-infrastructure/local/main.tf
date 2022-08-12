@@ -47,9 +47,42 @@ resource "kind_cluster" "default" {
     api_version = "kind.x-k8s.io/v1alpha4"
 
     node {
-      role  = "general"
-      image = "kindest/node:v1.21.10"
+      role = "general"
+
+      # kubeadm_config_patches = [
+      #     "kind: InitConfiguration\nnodeRegistration:\n  kubeletExtraArgs:\n    node-labels: \"ingress-ready=true\"\n"
+      # ]
+
+      extra_port_mappings {
+        container_port = 80
+        host_port      = 80
+      }
+      extra_port_mappings {
+        container_port = 443
+        host_port      = 443
+      }
+      extra_port_mappings {
+        container_port = 8022
+        host_port      = 8022
+      }
+      extra_port_mappings {
+        container_port = 8023
+        host_port      = 8023
+      }
+      extra_port_mappings {
+        container_port = 9080
+        host_port      = 9080
+      }
+      extra_port_mappings {
+        container_port = 8786
+        host_port      = 8786
+      }
     }
+
+    # node {
+    #   role  = "worker"
+    #   image = "kindest/node:v1.21.10"
+    # }
   }
 }
 

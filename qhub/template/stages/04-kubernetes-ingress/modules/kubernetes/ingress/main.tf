@@ -257,36 +257,43 @@ resource "kubernetes_deployment" "main" {
           port {
             name           = "http"
             container_port = 80
+            host_port      = 80
           }
 
           port {
             name           = "https"
             container_port = 443
+            host_port      = 443
           }
 
           port {
             name           = "ssh"
             container_port = 8022
+            host_port      = 8022
           }
 
           port {
             name           = "sftp"
             container_port = 8023
+            host_port      = 8023
           }
 
           port {
             name           = "tcp"
             container_port = 8786
+            host_port      = 8786
           }
 
           port {
             name           = "traefik"
             container_port = 9000
+            host_port      = 9000
           }
 
           port {
             name           = "minio"
             container_port = 9080
+            host_port      = 9080
           }
 
           liveness_probe {
