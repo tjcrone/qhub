@@ -1,3 +1,7 @@
+image:
+  repository: wizzn/keycloak
+  tag: "14"
+
 ingress:
   # Helm chart (14.0 anyway) will only define Ingress records, not IngressRoute as required by Traefik, so
   # we will need to define our own IngressRoute elsewhere.

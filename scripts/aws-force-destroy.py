@@ -13,6 +13,8 @@ def main():
     parser.add_argument("-c", "--config", help="qhub configuration", required=True)
     args = parser.parse_args()
 
+    print(args)
+
     handle_force_destroy(args)
 
 
