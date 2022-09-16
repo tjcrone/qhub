@@ -404,6 +404,8 @@ def render_config(
         ] = "Autoscaling Compute Environment on Azure"
         config["azure"] = AZURE.copy()
         set_kubernetes_version(config, kubernetes_version, cloud_provider)
+        if "AZURE_DEFAULT_REGION" in os.environ:
+            config["azure"]["region"] = os.environ["AZURE_DEFAULT_REGION"]
 
     elif cloud_provider == "aws":
         config["theme"]["jupyterhub"][
