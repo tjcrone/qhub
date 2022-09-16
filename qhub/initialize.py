@@ -289,6 +289,8 @@ def render_config(
     kubernetes_version=None,
     disable_prompt=False,
     ssl_cert_email=None,
+    github_client_id=None,
+    github_client_secret=None
 ):
     config = BASE_CONFIGURATION.copy()
     config["provider"] = cloud_provider
@@ -356,13 +358,14 @@ def render_config(
             f"  set the callback_url to: https://{qhub_domain}/auth/realms/qhub/broker/github/endpoint"
         )
 
-        if not disable_prompt:
-            config["security"]["authentication"]["config"]["client_id"] = input(
-                "Github client_id: "
-            )
-            config["security"]["authentication"]["config"]["client_secret"] = input(
-                "Github client_secret: "
-            )
+        if github_client_id is None and not disable_prompt:
+            github_client_id = input("Github client_id: ")
+        config["security"]["authentication"]["config"]["client_id"] = github_client_id
+
+        if github_client_secret is None and not disable_prompt:
+            github_client_secret = input("Github client_secret: ")
+        config["security"]["authentication"]["config"]["client_secret"] = github_client_secret
+
     elif auth_provider == "auth0":
         config["security"]["authentication"] = AUTH_OAUTH_AUTH0.copy()
 

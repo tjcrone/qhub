@@ -61,6 +61,14 @@ def create_init_subcommand(subparser):
         "--ssl-cert-email",
         help="Allow generation of a LetsEncrypt SSL cert - requires an administrative email",
     )
+    subparser.add_argument(
+        "--github-client-id",
+        help="GitHub client id",
+    )
+    subparser.add_argument(
+        "--github-client-secret",
+        help="GitHub client secret"
+    )
     subparser.set_defaults(func=handle_init)
 
 
@@ -90,6 +98,8 @@ def handle_init(args):
         kubernetes_version=args.kubernetes_version,
         disable_prompt=args.disable_prompt,
         ssl_cert_email=args.ssl_cert_email,
+        github_client_id=args.github_client_id,
+        github_client_secret=args.github_client_secret
     )
 
     try:
